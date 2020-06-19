@@ -12,13 +12,13 @@ from maskrcnn_benchmark.utils.model_zoo import cache_url
 
 class Checkpointer(object):
     def __init__(
-        self,
-        model,
-        optimizer=None,
-        scheduler=None,
-        save_dir="",
-        save_to_disk=None,
-        logger=None,
+            self,
+            model,
+            optimizer=None,
+            scheduler=None,
+            save_dir="",
+            save_to_disk=None,
+            logger=None,
     ):
         self.model = model
         self.optimizer = optimizer
@@ -100,14 +100,14 @@ class Checkpointer(object):
 
 class DetectronCheckpointer(Checkpointer):
     def __init__(
-        self,
-        cfg,
-        model,
-        optimizer=None,
-        scheduler=None,
-        save_dir="",
-        save_to_disk=None,
-        logger=None,
+            self,
+            cfg,
+            model,
+            optimizer=None,
+            scheduler=None,
+            save_dir="",
+            save_to_disk=None,
+            logger=None,
     ):
         super(DetectronCheckpointer, self).__init__(
             model, optimizer, scheduler, save_dir, save_to_disk, logger
@@ -120,7 +120,7 @@ class DetectronCheckpointer(Checkpointer):
             paths_catalog = import_file(
                 "maskrcnn_benchmark.config.paths_catalog", self.cfg.PATHS_CATALOG, True
             )
-            catalog_f = paths_catalog.ModelCatalog.get(f[len("catalog://") :])
+            catalog_f = paths_catalog.ModelCatalog.get(f[len("catalog://"):])
             self.logger.info("{} points to {}".format(f, catalog_f))
             f = catalog_f
         # download url files
@@ -137,3 +137,33 @@ class DetectronCheckpointer(Checkpointer):
         if "model" not in loaded:
             loaded = dict(model=loaded)
         return loaded
+
+
+class DetectionCheckpointer(DetectronCheckpointer):
+    def _load_file(self, f, model_only=False):
+        loaded = super(DetectionCheckpointer, self)._load_file(f)
+        if model_only:
+            loaded = {"model": loaded["model"]}
+        return loaded
+
+    def load(self, f=None, resume=False):
+        if self.has_checkpoint():
+            # override argument with existing checkpoint
+            f = self.get_checkpoint_file()
+        if not f:
+            # no checkpoint could be found
+            self.logger.info("No checkpoint found. Initializing model from scratch")
+            return {}
+        self.logger.info("Loading checkpoint from {}".format(f))
+        checkpoint = self._load_file(f, not resume)
+        self._load_model(checkpoint)
+        if resume:
+            if "optimizer" in checkpoint and self.optimizer:
+                self.logger.info("Loading optimizer from {}".format(f))
+                self.optimizer.load_state_dict(checkpoint.pop("optimizer"))
+            if "scheduler" in checkpoint and self.scheduler:
+                self.logger.info("Loading scheduler from {}".format(f))
+                self.scheduler.load_state_dict(checkpoint.pop("scheduler"))
+
+        # return any further checkpoint data
+        return checkpoint

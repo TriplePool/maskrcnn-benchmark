@@ -1,0 +1,32 @@
+MODEL:
+  CLASSIFIER_ON: True
+  CLASSIFIER:
+    ENCODING_TYPE: "MesoInception4"
+    DECODING_TYPE: "Baseline-CE"
+
+DATASETS:
+  TRAIN: ("deep_fake_detection_train",)
+  TEST: ("deep_fake_detection_test",)
+
+DATALOADER:
+  SIZE_DIVISIBILITY: 32
+  ASPECT_RATIO_GROUPING: False
+
+SOLVER:
+  BASE_LR: 0.004 #0.02
+  WARMUP_FACTOR: 0.1
+  WEIGHT_DECAY: 0.0001
+  STEPS: (260000, 520000)
+  MAX_ITER: 800000
+  IMS_PER_BATCH: 32
+  RESUME: False
+
+OUTPUT_DIR: "./outputs/baseline_deep_fake_detection_mesonet_inc4"
+
+INPUT:
+  MIN_SIZE_TRAIN: 256
+  MAX_SIZE_TRAIN: 256
+  MIN_SIZE_TEST: 256
+  MAX_SIZE_TEST: 256
+  HORIZONTAL_FLIP_PROB_TRAIN: 0.0
+  VERTICAL_FLIP_PROB_TRAIN: 0.0

@@ -4,6 +4,7 @@
 import os
 from copy import deepcopy
 
+
 class DatasetCatalog(object):
     DATA_DIR = "datasets"
     DATASETS = {
@@ -147,6 +148,12 @@ class DatasetCatalog(object):
             "mode": "mask",
             "mini": 10,
         },
+        "deep_fake_detection_train": {
+            "list_file_path": "deep_fake_detection_train.txt"
+        },
+        "deep_fake_detection_test": {
+            "list_file_path": "deep_fake_detection_train.txt"
+        },
     }
 
     @staticmethod
@@ -179,6 +186,11 @@ class DatasetCatalog(object):
             attrs["img_dir"] = os.path.join(data_dir, attrs["img_dir"])
             attrs["ann_dir"] = os.path.join(data_dir, attrs["ann_dir"])
             return dict(factory="CityScapesDataset", args=attrs)
+        elif "deep_fake" in name:
+            data_dir = DatasetCatalog.DATA_DIR
+            attrs = deepcopy(DatasetCatalog.DATASETS[name])
+            attrs["list_file_path"] = os.path.join(data_dir, attrs["list_file_path"])
+            return dict(factory="FaceForensicsDataset", args=attrs)
         raise RuntimeError("Dataset not available: {}".format(name))
 
 

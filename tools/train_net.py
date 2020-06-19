@@ -5,6 +5,7 @@ Basic training script for PyTorch
 
 # Set up custom environment before nearly anything else is imported
 # NOTE: this should be the first import (no not reorder)
+from maskrcnn_benchmark.modeling.classifier.classifiers import build_classifier_model
 from maskrcnn_benchmark.utils.env import setup_environment  # noqa F401 isort:skip
 
 import argparse
@@ -16,13 +17,13 @@ from maskrcnn_benchmark.data import make_data_loader
 from maskrcnn_benchmark.solver import make_lr_scheduler
 from maskrcnn_benchmark.solver import make_optimizer
 from maskrcnn_benchmark.engine.inference import inference
-from maskrcnn_benchmark.engine.trainer import do_train
+from maskrcnn_benchmark.engine.trainer import do_train, do_train_for_classifier
 from maskrcnn_benchmark.modeling.detector import build_detection_model
-from maskrcnn_benchmark.utils.checkpoint import DetectronCheckpointer
+from maskrcnn_benchmark.utils.checkpoint import DetectionCheckpointer
 from maskrcnn_benchmark.utils.collect_env import collect_env_info
 from maskrcnn_benchmark.utils.comm import synchronize, get_rank
 from maskrcnn_benchmark.utils.imports import import_file
-from maskrcnn_benchmark.utils.logger import setup_logger
+from maskrcnn_benchmark.utils.logger import setup_logger, TBLogger
 from maskrcnn_benchmark.utils.miscellaneous import mkdir, save_config
 
 # See if we can use apex.DistributedDataParallel instead of the torch default,
@@ -34,7 +35,10 @@ except ImportError:
 
 
 def train(cfg, local_rank, distributed):
-    model = build_detection_model(cfg)
+    if cfg.MODEL.CLASSIFIER_ON:
+        model = build_classifier_model(cfg)
+    else:
+        model = build_detection_model(cfg)
     device = torch.device(cfg.MODEL.DEVICE)
     model.to(device)
 
@@ -59,10 +63,10 @@ def train(cfg, local_rank, distributed):
     output_dir = cfg.OUTPUT_DIR
 
     save_to_disk = get_rank() == 0
-    checkpointer = DetectronCheckpointer(
+    checkpointer = DetectionCheckpointer(
         cfg, model, optimizer, scheduler, output_dir, save_to_disk
     )
-    extra_checkpoint_data = checkpointer.load(cfg.MODEL.WEIGHT)
+    extra_checkpoint_data = checkpointer.load(cfg.MODEL.WEIGHT, resume=cfg.SOLVER.RESUME)
     arguments.update(extra_checkpoint_data)
 
     data_loader = make_data_loader(
@@ -80,19 +84,34 @@ def train(cfg, local_rank, distributed):
 
     checkpoint_period = cfg.SOLVER.CHECKPOINT_PERIOD
 
-    do_train(
-        cfg,
-        model,
-        data_loader,
-        data_loader_val,
-        optimizer,
-        scheduler,
-        checkpointer,
-        device,
-        checkpoint_period,
-        test_period,
-        arguments,
-    )
+    if cfg.MODEL.CLASSIFIER_ON:
+        tb_logger = TBLogger(cfg.OUTPUT_DIR)
+        do_train_for_classifier(cfg,
+                                model,
+                                data_loader,
+                                data_loader_val,
+                                optimizer,
+                                scheduler,
+                                checkpointer,
+                                device,
+                                checkpoint_period,
+                                test_period,
+                                arguments, tb_logger)
+
+    else:
+        do_train(
+            cfg,
+            model,
+            data_loader,
+            data_loader_val,
+            optimizer,
+            scheduler,
+            checkpointer,
+            device,
+            checkpoint_period,
+            test_period,
+            arguments,
+        )
 
     return model
 

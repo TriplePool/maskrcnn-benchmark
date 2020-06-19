@@ -3,6 +3,8 @@ import logging
 import os
 import sys
 
+from torch.utils.tensorboard import SummaryWriter
+
 
 def setup_logger(name, save_dir, distributed_rank, filename="log.txt"):
     logger = logging.getLogger(name)
@@ -23,3 +25,15 @@ def setup_logger(name, save_dir, distributed_rank, filename="log.txt"):
         logger.addHandler(fh)
 
     return logger
+
+class TBLogger(object):
+    def __init__(self, log_dir, distributed_rank=0):
+        """Create a summary writer logging to log_dir."""
+        self.distributed_rank = distributed_rank
+        if distributed_rank == 0:
+            self.writer = SummaryWriter(log_dir)
+
+    def scalar_summary(self, tag, value, step):
+        """Log a scalar variable."""
+        if self.distributed_rank == 0:
+            self.writer.add_scalar(tag, value, step)
