@@ -3,8 +3,8 @@ from torch import nn
 from torch.nn import functional as F
 
 
-def build_classifier_decoder(cfg):
-    return
+def build_classifier_decoder(cfg, input_channels):
+    return ClassifierDecoder(cfg, input_channels)
 
 
 class ClassifierDecoder(nn.Module):

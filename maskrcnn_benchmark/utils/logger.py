@@ -3,7 +3,7 @@ import logging
 import os
 import sys
 
-from torch.utils.tensorboard import SummaryWriter
+from tensorboardX import SummaryWriter
 
 
 def setup_logger(name, save_dir, distributed_rank, filename="log.txt"):

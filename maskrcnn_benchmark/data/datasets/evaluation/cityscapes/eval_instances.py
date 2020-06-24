@@ -42,7 +42,6 @@ import io
 from contextlib import redirect_stdout
 from tqdm import tqdm
 
-
 import torch
 import logging
 
@@ -147,7 +146,7 @@ def matchGtsWithPreds(dataset, predictions):
     }
     """
 
-    assert len(dataset) == len(predictions), f"{len(dataset)} != {len(predictions)}"
+    assert len(dataset) == len(predictions), "{} != {}".format(len(dataset), len(predictions))
 
     matches = []
     for idx in tqdm(range(len(predictions)), desc="Matching Preds with GT"):
@@ -361,8 +360,8 @@ def preparePredImage(dataset, predictions, idx):
 
         # sanity checks
         assert len(perImagePredictions) == len(maskTensor), (
-            "number of masks (%d) do not match the number of boxes (%d)"
-            % (len(perImagePredictions), len(maskTensor))
+                "number of masks (%d) do not match the number of boxes (%d)"
+                % (len(perImagePredictions), len(maskTensor))
         )
 
         maskTensor = maskTensor.float()
@@ -484,9 +483,9 @@ def evaluateBoxMatches(matches, args):
                         foundMatch = False
                         for pred in gt["matchedPred"]:
                             overlap = float(pred["boxIntersection"]) / (
-                                gt["boxArea"]
-                                + pred["boxArea"]
-                                - pred["boxIntersection"]
+                                    gt["boxArea"]
+                                    + pred["boxArea"]
+                                    - pred["boxIntersection"]
                             )
                             if overlap > overlapTh:
                                 # the score
@@ -520,7 +519,7 @@ def evaluateBoxMatches(matches, args):
                         foundGt = False
                         for gt in pred["matchedGt"]:
                             overlap = float(gt["boxIntersection"]) / (
-                                gt["boxArea"] + pred["boxArea"] - gt["boxIntersection"]
+                                    gt["boxArea"] + pred["boxArea"] - gt["boxIntersection"]
                             )
                             if overlap > overlapTh:
                                 foundGt = True
@@ -534,7 +533,7 @@ def evaluateBoxMatches(matches, args):
                                     nbIgnorePixels += gt["boxIntersection"]
                             if pred["boxArea"] > 0:
                                 proportionIgnore = (
-                                    float(nbIgnorePixels) / pred["boxArea"]
+                                        float(nbIgnorePixels) / pred["boxArea"]
                                 )
                             else:
                                 proportionIgnore = 0
@@ -685,9 +684,9 @@ def evaluateMaskMatches(matches, args):
                         foundMatch = False
                         for pred in gt["matchedPred"]:
                             overlap = float(pred["maskIntersection"]) / (
-                                gt["pixelCount"]
-                                + pred["pixelCount"]
-                                - pred["maskIntersection"]
+                                    gt["pixelCount"]
+                                    + pred["pixelCount"]
+                                    - pred["maskIntersection"]
                             )
                             if overlap > overlapTh:
                                 # the score
@@ -721,9 +720,9 @@ def evaluateMaskMatches(matches, args):
                         foundGt = False
                         for gt in pred["matchedGt"]:
                             overlap = float(gt["maskIntersection"]) / (
-                                gt["pixelCount"]
-                                + pred["pixelCount"]
-                                - gt["maskIntersection"]
+                                    gt["pixelCount"]
+                                    + pred["pixelCount"]
+                                    - gt["maskIntersection"]
                             )
                             if overlap > overlapTh:
                                 foundGt = True
@@ -740,7 +739,7 @@ def evaluateMaskMatches(matches, args):
                                 proportionIgnore = 0
                             else:
                                 proportionIgnore = (
-                                    float(nbIgnorePixels) / pred["pixelCount"]
+                                        float(nbIgnorePixels) / pred["pixelCount"]
                                 )
                             # if not ignored
                             # append false positive

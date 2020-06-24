@@ -6,7 +6,7 @@ from copy import deepcopy
 
 
 class DatasetCatalog(object):
-    DATA_DIR = "datasets"
+    DATA_DIR = "/home-hd-1/gpu/Workspace/Datas"
     DATASETS = {
         "coco_2017_train": {
             "img_dir": "coco/train2017",
@@ -149,10 +149,10 @@ class DatasetCatalog(object):
             "mini": 10,
         },
         "deep_fake_detection_train": {
-            "list_file_path": "deep_fake_detection_train.txt"
+            "list_file_path": "dataset/ds/train.txt"
         },
         "deep_fake_detection_test": {
-            "list_file_path": "deep_fake_detection_train.txt"
+            "list_file_path": "dataset/ds/test.txt"
         },
     }
 

@@ -30,7 +30,7 @@ def do_cityscapes_evaluation(
 ):
 
     logger = logging.getLogger("maskrcnn_benchmark.inference")
-    logger.info(f"CityScapes evaluation on [{dataset}]:")
+    logger.info("CityScapes evaluation on [{}]:".format(dataset))
     # Set default args for evaluation
     args = deepcopy(eval_instances.defaultArgs)
 
@@ -52,7 +52,7 @@ def do_cityscapes_evaluation(
         matches = eval_instances.matchGtsWithPreds(dataset, predictions)
         writeDict2JSON(matches, args.exportMatchFile)
     else:
-        NotImplementedError(f"IoU type not implemented {iou_types}")
+        NotImplementedError("IoU type not implemented {}".format(iou_types))
 
     # printing
     strResults = ""

@@ -1,14 +1,14 @@
 from PIL import Image, ImageDraw, ImageFont
 import torch
 import os
-
+import random
 from maskrcnn_benchmark.structures.target_list import TargetList
 
 
 def read_img_list(list_file_path):
     with open(list_file_path) as f:
         res = []
-        lines = f.readlines(list_file_path)
+        lines = f.readlines()
         for line in lines:
             line = line[:-1]
             file_path, class_id, domain_id = line.split(',')
@@ -62,20 +62,59 @@ class FaceForensicsDataset(object):
 
 
 if __name__ == '__main__':
-    videos_dir = "/home-hd-1/gpu/Workspace/Datas/dataset/ds/manipulated_sequences/DeepFakeDetection/c23/faces/"
-    file_lists, img_num = get_all_faces_from_deep_fake_detection_dir(videos_dir)
-    print(img_num)
-    test_ratio = 0.1
-    train_num = (1 - test_ratio) * img_num
-    num_flag = 0
-    i = 0
-    while num_flag < train_num:
-        num_flag += len(file_lists[i])
-        i += 1
+    # videos_dir = "/home-hd-1/gpu/Workspace/Datas/dataset/ds/original_sequences/actors/c23/faces/"
+    # file_lists, img_num = get_all_faces_from_deep_fake_detection_dir(videos_dir)
+    # print(img_num)
+    # test_ratio = 0.1
+    # train_num = (1 - test_ratio) * img_num
+    # num_flag = 0
+    # i = 0
+    # while num_flag < train_num:
+    #     num_flag += len(file_lists[i])
+    #     i += 1
+    #
+    # train_index = i - 1
+    # train_path = "/home-hd-1/gpu/Workspace/Datas/dataset/ds/real_train.txt"
+    # test_path = "/home-hd-1/gpu/Workspace/Datas/dataset/ds/real_test.txt"
+    #
+    # write_lists_to_file(file_lists[:train_index + 1], train_path, 0, 0)
+    # write_lists_to_file(file_lists[train_index + 1:], test_path, 0, 0)
 
-    train_index = i - 1
-    train_path = "/home-hd-1/gpu/Workspace/Datas/dataset/ds/fake_train.txt"
-    test_path = "/home-hd-1/gpu/Workspace/Datas/dataset/ds/fake_test.txt"
+    fake_train_path = "/home-hd-1/gpu/Workspace/Datas/dataset/ds/fake_train.txt"
+    fake_test_path = "/home-hd-1/gpu/Workspace/Datas/dataset/ds/fake_test.txt"
+    real_train_path = "/home-hd-1/gpu/Workspace/Datas/dataset/ds/real_train.txt"
+    real_test_path = "/home-hd-1/gpu/Workspace/Datas/dataset/ds/real_test.txt"
 
-    write_lists_to_file(file_lists[:train_index + 1], train_path, 1, 0)
-    write_lists_to_file(file_lists[train_index + 1:], test_path, 1, 0)
+    with open(fake_train_path) as f:
+        fake_train_lines = f.readlines()
+    with open(fake_test_path) as f:
+        fake_test_lines = f.readlines()
+    with open(real_train_path) as f:
+        real_train_lines = f.readlines()
+    with open(real_test_path) as f:
+        real_test_lines = f.readlines()
+
+    random.shuffle(fake_train_lines)
+    random.shuffle(fake_test_lines)
+    random.shuffle(real_train_lines)
+    random.shuffle(real_test_lines)
+
+    print('train-real: {}, train-fake: {}, test-real: {}, test-fake: {}'.format(len(real_train_lines),
+                                                                                len(fake_train_lines),
+                                                                                len(real_test_lines),
+                                                                                len(fake_test_lines)))
+
+    train_list = real_train_lines + fake_train_lines
+    test_list = real_test_lines + fake_test_lines
+
+    random.shuffle(train_list)
+    random.shuffle(test_list)
+
+    print('train: {}, test: {}'.format(len(train_list), len(test_list)))
+
+    train_path = "/home-hd-1/gpu/Workspace/Datas/dataset/ds/train.txt"
+    test_path = "/home-hd-1/gpu/Workspace/Datas/dataset/ds/test.txt"
+    with open(train_path, 'w') as f:
+        f.writelines(train_list)
+    with open(test_path, 'w') as f:
+        f.writelines(test_list)

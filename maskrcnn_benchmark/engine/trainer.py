@@ -9,7 +9,7 @@ import torch.distributed as dist
 from tqdm import tqdm
 
 from maskrcnn_benchmark.data import make_data_loader
-from maskrcnn_benchmark.utils.comm import get_world_size, synchronize
+from maskrcnn_benchmark.utils.comm import get_world_size, synchronize, is_main_process
 from maskrcnn_benchmark.utils.metric_logger import MetricLogger
 from maskrcnn_benchmark.engine.inference import inference
 
