@@ -41,6 +41,6 @@ class ClassifierDecoder(nn.Module):
             loss['classify_loss'] = classify_loss
             if domain_output is not None:
                 domain_loss = F.cross_entropy(domain_output, targets.domain_ids)
-                loss['domain_loss'] = classify_loss
+                loss['domain_loss'] = domain_loss
 
         return (classify_output, domain_output), loss
