@@ -1,9 +1,2 @@
-export NGPUS=3
-#python -m torch.distributed.launch --nproc_per_node=$NGPUS ./tools/test_net.py --config-file "./configs/lomor/lomor_R_50_FPN_1x_finetune_no_enhancer.yaml"
-#python -m torch.distributed.launch --nproc_per_node=$NGPUS ./tools/test_net.py --config-file "./configs/lomor/lomor_R_50_FPN_1x_finetune_with_enhancer.yaml"
-#python -m torch.distributed.launch --nproc_per_node=$NGPUS ./tools/test_net.py --config-file "./configs/lomor/lomor_R_50_FPN_1x_finetune_no_enhancer_v2.yaml"
-#python -m torch.distributed.launch --nproc_per_node=$NGPUS ./tools/test_net.py --config-file "./configs/lomor/lomor_R_50_FPN_1x_finetune_no_enhancer_v2_total_text.yaml"
-#python -m torch.distributed.launch --nproc_per_node=$NGPUS ./tools/test_net.py --config-file "./configs/lomor/lomor_R_50_FPN_1x_finetune_no_enhancer_v2_total_text_english.yaml"
-#python -m torch.distributed.launch --nproc_per_node=$NGPUS ./tools/test_net.py --config-file "./configs/lomor/lomor_R_50_FPN_1x_finetune_with_enhancer_v2_total_text_latin_light.yaml"
-python -m torch.distributed.launch --nproc_per_node=$NGPUS ./tools/test_net.py --config-file "./configs/lomor/lomor_R_50_FPN_1x_finetune_with_enhancer_v2_total_text_latin_light_shared.yaml"
-#python -m torch.distributed.launch --nproc_per_node=$NGPUS ./tools/test_net.py --config-file "./configs/lomor/lomor_R_50_FPN_1x_det_only.yaml"
+export NGPUS=2
+python -m torch.distributed.launch --nproc_per_node=$NGPUS ./tools/test_net.py --config-file "./configs/deep_fake/baseline_deep_fake_detection_mesonet_inc4.yaml"

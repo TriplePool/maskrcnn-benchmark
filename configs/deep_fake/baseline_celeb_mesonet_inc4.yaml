@@ -5,8 +5,8 @@ MODEL:
     DECODING_TYPE: "Baseline-CE"
 
 DATASETS:
-  TRAIN: ("deep_fake_detection_train",)
-  TEST: ("deep_fake_detection_test", "deep_fake_celeb_test")
+  TRAIN: ("deep_fake_celeb_train",)
+  TEST: ("deep_fake_celeb_test",)
 
 DATALOADER:
   SIZE_DIVISIBILITY: 32
@@ -22,7 +22,7 @@ SOLVER:
   TEST_PERIOD: 12000
   RESUME: False
 
-OUTPUT_DIR: "./outputs/baseline_deep_fake_detection_mesonet_inc4"
+OUTPUT_DIR: "./outputs/baseline_celeb_mesonet_inc4"
 
 INPUT:
   MIN_SIZE_TRAIN: (256, )

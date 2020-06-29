@@ -1,6 +1,7 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved.
 # Set up custom environment before nearly anything else is imported
 # NOTE: this should be the first import (no not reorder)
+from maskrcnn_benchmark.modeling.classifier.classifiers import build_classifier_model
 from maskrcnn_benchmark.utils.env import setup_environment  # noqa F401 isort:skip
 
 import argparse
@@ -69,7 +70,11 @@ def main():
     logger.info("Collecting env info (might take some time)")
     logger.info("\n" + collect_env_info())
 
-    model = build_detection_model(cfg)
+    if cfg.MODEL.CLASSIFIER_ON:
+        model = build_classifier_model(cfg)
+    else:
+        model = build_detection_model(cfg)
+
     model.to(cfg.MODEL.DEVICE)
 
     # Initialize mixed-precision if necessary
@@ -106,6 +111,7 @@ def main():
             expected_results=cfg.TEST.EXPECTED_RESULTS,
             expected_results_sigma_tol=cfg.TEST.EXPECTED_RESULTS_SIGMA_TOL,
             output_folder=output_folder,
+            vis=cfg.TEST.VIS,
         )
         synchronize()
 

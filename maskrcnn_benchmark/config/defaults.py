@@ -39,6 +39,8 @@ _C.MODEL.CLASSIFIER.ENCODING_TYPE = "MesoInception4"
 _C.MODEL.CLASSIFIER.DECODING_TYPE = "Baseline-BCE"
 _C.MODEL.CLASSIFIER.NUM_CLASS = 2
 _C.MODEL.CLASSIFIER.NUM_DOMAIN = 2
+_C.MODEL.CLASSIFIER.DOMAIN_LAMBDA = 1.0
+_C.MODEL.CLASSIFIER.DOMAIN_ALPHA = 1.0
 
 # -----------------------------------------------------------------------------
 # INPUT
@@ -446,6 +448,8 @@ _C.TEST.BBOX_AUG.MAX_SIZE = 4000
 
 # Horizontal flip at each scale
 _C.TEST.BBOX_AUG.SCALE_H_FLIP = False
+
+_C.TEST.VIS = False
 
 # ---------------------------------------------------------------------------- #
 # Misc options

@@ -154,6 +154,15 @@ class DatasetCatalog(object):
         "deep_fake_detection_test": {
             "list_file_path": "dataset/ds/test.txt"
         },
+        "deep_fake_celeb_train": {
+            "list_file_path": "dataset/Celeb-DF-v2/train.txt"
+        },
+        "deep_fake_celeb_test": {
+            "list_file_path": "dataset/Celeb-DF-v2/test.txt"
+        },
+        "deep_fake_merged_train_d500_c1500": {
+            "list_file_path": "dataset/merged/train_d500_c1500.txt"
+        },
     }
 
     @staticmethod

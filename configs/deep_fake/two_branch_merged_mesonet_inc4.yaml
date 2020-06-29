@@ -2,10 +2,14 @@ MODEL:
   CLASSIFIER_ON: True
   CLASSIFIER:
     ENCODING_TYPE: "MesoInception4"
-    DECODING_TYPE: "Baseline-CE"
+    DECODING_TYPE: "TwoBranch"
+    NUM_CLASS: 2
+    NUM_DOMAIN: 2
+    DOMAIN_LAMBDA: 0.1
+  WEIGHT: "./outputs/baseline_deep_fake_detection_mesonet_inc4/model_final.pth"
 
 DATASETS:
-  TRAIN: ("deep_fake_detection_train",)
+  TRAIN: ("deep_fake_merged_train_d500_c1500",)
   TEST: ("deep_fake_detection_test", "deep_fake_celeb_test")
 
 DATALOADER:
@@ -16,13 +20,13 @@ SOLVER:
   BASE_LR: 0.02
   WARMUP_FACTOR: 0.1
   WEIGHT_DECAY: 0.0001
-  STEPS: (40000, 80000)
-  MAX_ITER: 120000
+  STEPS: (4000, 8000)
+  MAX_ITER: 12000
   IMS_PER_BATCH: 128
-  TEST_PERIOD: 12000
+  TEST_PERIOD: 2000
   RESUME: False
 
-OUTPUT_DIR: "./outputs/baseline_deep_fake_detection_mesonet_inc4"
+OUTPUT_DIR: "./outputs/two_branch_merged_mesonet_inc4"
 
 INPUT:
   MIN_SIZE_TRAIN: (256, )
