@@ -25,6 +25,7 @@ class ReverseLayerF(Function):
 class ClassifierDecoder(nn.Module):
     def __init__(self, cfg, input_channels):
         super(ClassifierDecoder, self).__init__()
+        self.cfg = cfg
         self.classify_head = nn.Sequential(
             nn.Dropout2d(0.5),
             nn.Linear(input_channels, 16),
@@ -55,17 +56,36 @@ class ClassifierDecoder(nn.Module):
 
         loss = {}
         if self.training:
-            classify_loss = F.cross_entropy(classify_output, targets.class_ids)
             if domain_output is not None:
-                domain_loss = (-self.domain_lambda) * F.cross_entropy(domain_output, targets.domain_ids)
-                loss['merged_loss'] = classify_loss + domain_loss
+                classify_output_list = classify_output.chunk(self.cfg.MODEL.CLASSIFIER.NUM_DOMAIN)
+                domain_output_list = domain_output.chunk(self.cfg.MODEL.CLASSIFIER.NUM_DOMAIN)
+                classify_target_list = targets.class_ids.chunk(self.cfg.MODEL.CLASSIFIER.NUM_DOMAIN)
+                domain_target_list = targets.domain_ids.chunk(self.cfg.MODEL.CLASSIFIER.NUM_DOMAIN)
+                loss['src_loss_class'] = F.cross_entropy(classify_output_list[0], classify_target_list[0])
+                loss['src_loss_domain'] = F.cross_entropy(domain_output_list[0], domain_target_list[0])
+                loss['tgt_loss_domain'] = 0
+                for i in range(1, len(domain_output_list)):
+                    loss['tgt_loss_domain'] += F.cross_entropy(domain_output_list[i], domain_target_list[i])
+                loss['tgt_loss_domain'] *= self.domain_lambda
+
             else:
+                classify_loss = F.cross_entropy(classify_output, targets.class_ids)
                 loss['classify_loss'] = classify_loss
 
             return (classify_output, domain_output), loss
         else:
             res = post_process(classify_output, domain_output)
             return res, loss
+
+
+def split_tensor_avg(t, parts_num):
+    part_len = t.shape[0] // parts_num
+    flag = 0
+    res = []
+    for i in range(parts_num):
+        res.append(t[flag:flag + part_len, ...])
+        flag += part_len
+    return res
 
 
 def post_process(classify_output, domain_output):

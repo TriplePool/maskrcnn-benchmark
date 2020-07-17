@@ -43,22 +43,52 @@ def write_lists_to_file(file_lists, output_path, class_id=1, domain_id=0):
         f.write(out_str)
 
 
+def split_data_with_domain(datalist):
+    res = {}
+    for d in datalist:
+        img_path, class_id, domain_id = d
+        if domain_id not in res:
+            res[domain_id] = [(img_path, class_id)]
+        else:
+            res[domain_id].append((img_path, class_id))
+    return res
+
+
 class FaceForensicsDataset(object):
-    def __init__(self, list_file_path, transforms):
+    def __init__(self, list_file_path, transforms, split_with_domain=False):
         self.data_list = read_img_list(list_file_path)
         self.transforms = transforms
+        self.split_with_domain = split_with_domain
+        if self.split_with_domain:
+            self.data_dict = split_data_with_domain(self.data_list)
 
     def __len__(self):
-        return len(self.data_list)
+        if not self.split_with_domain:
+            return len(self.data_list)
+        else:
+            return max([len(x) for x in self.data_dict.values()])
 
     def __getitem__(self, item):
-        img_path, class_id, domain_id = self.data_list[item]
-        img = Image.open(img_path).convert("RGB")
-        target = TargetList([class_id], [domain_id])
-        if self.transforms is not None:
-            img, target = self.transforms(img, target)
+        if not self.split_with_domain:
+            img_path, class_id, domain_id = self.data_list[item]
+            img = Image.open(img_path).convert("RGB")
+            target = TargetList([class_id], [domain_id])
+            if self.transforms is not None:
+                img, target = self.transforms(img, target)
 
-        return img, target, item
+            return img, target, item
+        else:
+            imgs = []
+            targets = []
+            for k in list(sorted(self.data_dict.keys())):
+                img_path, class_id = self.data_dict[k][item % len(self.data_dict[k])]
+                img = Image.open(img_path).convert("RGB")
+                target = TargetList([class_id], [k])
+                if self.transforms is not None:
+                    img, target = self.transforms(img, target)
+
+                imgs.append(img), targets.append(target), item
+            return imgs, targets, item
 
 
 if __name__ == '__main__':
